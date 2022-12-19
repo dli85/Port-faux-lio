@@ -6,17 +6,21 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 from google.cloud import storage
+from dotenv import load_dotenv
 import os
 from PIL import Image
 import concurrent.futures
 
 os.environ.setdefault("GCLOUD_PROJECT", "beautiful-curry")
 
-#set your env variable EMAIL and PASS
+load_dotenv('../login.env')
+
+# set your env variable EMAIL and PASS
 EMAIL = os.environ['EMAIL']
 PASS = os.environ['PASS']
 
 BUCKET_NAME = "linkedin-headshots"
+
 
 def upload_blob(source_file_name, destination_blob_name):
     """Uploads a file to the bucket and deletes the local file."""
@@ -27,9 +31,9 @@ def upload_blob(source_file_name, destination_blob_name):
 
     blob.upload_from_filename(source_file_name)
 
-    #print(
-        #f"File {source_file_name} uploaded to {destination_blob_name}."
-    #)
+    # print(
+    # f"File {source_file_name} uploaded to {destination_blob_name}."
+    # )
 
     os.remove(source_file_name)
 
@@ -52,19 +56,21 @@ def log_in(driver, email, password):
 
     return driver
 
+
 def save_headshot(driver, local_path, profile_link):
     """Saves the headshot of the given link to the given path"""
     driver.get(profile_link)
     html = driver.page_source
     soup = BeautifulSoup(html, 'html.parser')
 
-    div = soup.find('div', {"class":"pv-top-card__non-self-photo-wrapper ml0"})
-    html_img = soup.find('img', {"class":"pv-top-card-profile-picture__image pv-top-card-profile-picture__image--show ember-view"})
+    div = soup.find('div', {"class": "pv-top-card__non-self-photo-wrapper ml0"})
+    html_img = soup.find('img', {
+        "class": "pv-top-card-profile-picture__image pv-top-card-profile-picture__image--show ember-view"})
     img_src = html_img.attrs['src']
 
     r = requests.get(img_src, stream=True)
     if r.status_code == 200:
-        with open(local_path, 'wb') as f: 
+        with open(local_path, 'wb') as f:
             f.write(r.content)
         img = Image.open(local_path)
         #print(img.size)
@@ -73,6 +79,7 @@ def save_headshot(driver, local_path, profile_link):
             resized.save(local_path)
     else:
         print("error saving headshot" + local_path)
+
 
 if __name__ == "__main__":
     links = ["https://www.linkedin.com/in/olivertoh/", "https://www.linkedin.com/in/david-li-0690aa17a", "https://www.linkedin.com/in/kartiktickoo/"]
