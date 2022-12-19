@@ -1,12 +1,14 @@
 from bs4 import BeautifulSoup
-from selenium import webdriver
 import requests
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 from google.cloud import storage
 import os
+from PIL import Image
+import concurrent.futures
 
 os.environ.setdefault("GCLOUD_PROJECT", "beautiful-curry")
 
@@ -61,17 +63,23 @@ def save_headshot(driver, local_path, profile_link):
     img_src = html_img.attrs['src']
 
     r = requests.get(img_src, stream=True)
-    image = r.content
-    print(len(image))
     if r.status_code == 200:
         with open(local_path, 'wb') as f: 
             f.write(r.content)
+        img = Image.open(local_path)
+        #print(img.size)
+        if img.size != (400, 400):
+            resized = img.resize((400, 400))
+            resized.save(local_path)
     else:
         print("error saving headshot" + local_path)
 
 if __name__ == "__main__":
-    links = ["https://www.linkedin.com/in/olivertoh/", "https://www.linkedin.com/in/david-li-0690aa17a"]
-    driver = log_in(webdriver.Chrome(), EMAIL, PASS)
+    links = ["https://www.linkedin.com/in/olivertoh/", "https://www.linkedin.com/in/david-li-0690aa17a", "https://www.linkedin.com/in/kartiktickoo/"]
+    
+    options = webdriver.ChromeOptions()
+    options.headless = True
+    driver = log_in(webdriver.Chrome(options=options), EMAIL, PASS)
 
     for i, l in enumerate(links):
         local_path = "headshots/images/img_{}.jpg".format(i)
