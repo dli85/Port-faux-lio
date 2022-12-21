@@ -61,12 +61,14 @@ def save_headshot(driver, local_path, profile_link):
     """Saves the headshot of the given link to the given path"""
     driver.get(profile_link)
     html = driver.page_source
-    soup = BeautifulSoup(html, 'html.parser')
+    print(html)
+    img_src = driver.find_element(By.CLASS_NAME, "pv-top-card-profile-picture__image pv-top-card-profile-picture__image--show ember-view").get_attribute("src")
+    """soup = BeautifulSoup(html, 'html.parser')
 
     div = soup.find('div', {"class": "pv-top-card__non-self-photo-wrapper ml0"})
     html_img = soup.find('img', {
         "class": "pv-top-card-profile-picture__image pv-top-card-profile-picture__image--show ember-view"})
-    img_src = html_img.attrs['src']
+    img_src = html_img.attrs['src']"""
 
     r = requests.get(img_src, stream=True)
     if r.status_code == 200:
@@ -85,11 +87,11 @@ if __name__ == "__main__":
     links = ["https://www.linkedin.com/in/olivertoh/", "https://www.linkedin.com/in/david-li-0690aa17a", "https://www.linkedin.com/in/kartiktickoo/"]
     
     options = webdriver.ChromeOptions()
-    options.headless = True
+    options.headless = False
     driver = log_in(webdriver.Chrome(options=options), EMAIL, PASS)
 
     for i, l in enumerate(links):
-        local_path = "headshots/images/img_{}.jpg".format(i)
+        local_path = "images/img_{}.jpg".format(i)
         save_headshot(driver, local_path, l)
         upload_blob(local_path, "indian/igs_{}.jpg".format(i))
 
