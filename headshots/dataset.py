@@ -61,14 +61,8 @@ def save_headshot(driver, local_path, profile_link):
     """Saves the headshot of the given link to the given path"""
     driver.get(profile_link)
     html = driver.page_source
-    print(html)
-    img_src = driver.find_element(By.CLASS_NAME, "pv-top-card-profile-picture__image pv-top-card-profile-picture__image--show ember-view").get_attribute("src")
-    """soup = BeautifulSoup(html, 'html.parser')
-
-    div = soup.find('div', {"class": "pv-top-card__non-self-photo-wrapper ml0"})
-    html_img = soup.find('img', {
-        "class": "pv-top-card-profile-picture__image pv-top-card-profile-picture__image--show ember-view"})
-    img_src = html_img.attrs['src']"""
+    #print(html)
+    img_src = driver.find_element(By.XPATH, "//img[@class='pv-top-card-profile-picture__image pv-top-card-profile-picture__image--show ember-view']").get_attribute("src")
 
     r = requests.get(img_src, stream=True)
     if r.status_code == 200:
@@ -84,7 +78,7 @@ def save_headshot(driver, local_path, profile_link):
 
 
 if __name__ == "__main__":
-    links = ["https://www.linkedin.com/in/olivertoh/", "https://www.linkedin.com/in/david-li-0690aa17a", "https://www.linkedin.com/in/kartiktickoo/"]
+    links = ["https://www.linkedin.com/in/olivertoh/", "https://www.linkedin.com/in/david-li-0690aa17a"]
     
     options = webdriver.ChromeOptions()
     options.headless = False
