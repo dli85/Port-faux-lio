@@ -13,7 +13,7 @@ import concurrent.futures
 
 os.environ.setdefault("GCLOUD_PROJECT", "beautiful-curry")
 
-load_dotenv('../login.env')
+load_dotenv('./../login.env')
 
 # set your env variable EMAIL and PASS
 EMAIL = os.environ['EMAIL']
