@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 import os
 from PIL import Image
 import concurrent.futures
+import time
+import random
 
 os.environ.setdefault("GCLOUD_PROJECT", "beautiful-curry")
 
@@ -49,13 +51,21 @@ def log_in(driver, email, password):
     except TimeoutException:
         print("Timed out waiting for page to load")
 
-    driver.find_element("id", "username").send_keys(email)
-    driver.find_element("id", "password").send_keys(password)
+    email_input = driver.find_element("id", "username")
+    human_input(email, email_input)
+
+    pass_input = driver.find_element("id", "password")
+    human_input(password, pass_input)
+
     submit = driver.find_element(By.XPATH, "//button[@class='btn__primary--large from__button--floating']")
     submit.click()
 
     return driver
 
+def human_input(text, element):
+    for l in text:
+        time.sleep(random.uniform(0, 0.2))
+        element.send_keys(l)
 
 def save_headshot(driver, local_path, profile_link):
     """Saves the headshot of the given link to the given path"""
