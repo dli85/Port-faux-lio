@@ -2,13 +2,11 @@ from bs4 import BeautifulSoup
 import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
 from google.cloud import storage
 from dotenv import load_dotenv
 import os
 from PIL import Image
+from login import log_in
 import concurrent.futures
 
 os.environ.setdefault("GCLOUD_PROJECT", "beautiful-curry")
@@ -38,23 +36,7 @@ def upload_blob(source_file_name, destination_blob_name):
     os.remove(source_file_name)
 
 
-def log_in(driver, email, password):
-    """Logs driver into LinkedIn with given credentials"""
 
-    driver.get("https://www.linkedin.com/login")
-    timeout = 60
-    try:
-        element_present = EC.presence_of_element_located((By.TAG_NAME, "body"))
-        WebDriverWait(driver, timeout).until(element_present)
-    except TimeoutException:
-        print("Timed out waiting for page to load")
-
-    driver.find_element("id", "username").send_keys(email)
-    driver.find_element("id", "password").send_keys(password)
-    submit = driver.find_element(By.XPATH, "//button[@class='btn__primary--large from__button--floating']")
-    submit.click()
-
-    return driver
 
 
 def save_headshot(driver, local_path, profile_link):

@@ -1,5 +1,6 @@
 import time
 
+from login import log_in
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -64,14 +65,6 @@ def scrape(links, driver):
             # input()
 
 
-def login_through_front_page(driver):
-    driver.get('https://www.linkedin.com/login')
-    WebDriverWait(driver, driver_wait).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="username"]'))) \
-        .click()
-    driver.find_element_by_id('username').send_keys(email)
-    driver.find_element_by_id('password').send_keys(password)
-    driver.find_element_by_xpath('/html/body/div[1]/main/div[2]/div[1]/form/div[3]/button').click()
-
 
 def sign_in_prompted(driver):
     WebDriverWait(driver, driver_wait).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div['
@@ -93,7 +86,7 @@ def sign_in_prompted(driver):
 if __name__ == '__main__':
     links = ['https://www.linkedin.com/in/olivertoh/']
     driver = webdriver.Chrome()
-    login_through_front_page(driver)
+    log_in(driver, email, password)
     # driver.get(links[0])
     # driver = sign_in_prompted(driver)
     scrape(links, driver)
