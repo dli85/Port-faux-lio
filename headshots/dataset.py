@@ -8,6 +8,8 @@ import os
 from PIL import Image
 from login import log_in
 import concurrent.futures
+import time
+import random
 
 os.environ.setdefault("GCLOUD_PROJECT", "beautiful-curry")
 
@@ -36,7 +38,10 @@ def upload_blob(source_file_name, destination_blob_name):
     os.remove(source_file_name)
 
 
-
+def human_input(text, element):
+    for l in text:
+        time.sleep(random.uniform(0, 0.2))
+        element.send_keys(l)
 
 
 def save_headshot(driver, local_path, profile_link):
