@@ -15,7 +15,7 @@ import pandas as pd
 
 os.environ.setdefault("GCLOUD_PROJECT", "beautiful-curry")
 
-load_dotenv('../login.env')
+load_dotenv('login.env')
 
 # set your env variable EMAIL and PASS
 EMAIL = os.environ['EMAIL']
@@ -37,45 +37,56 @@ def collect_profiles(query, driver, out_csv):
         page_profiles = {"fullname":[], "headline":[], "url":[], "headshot_src":[]}
 
         for profile in profile_list:
-            print(profile.page_source)
-            url = profile.find_element(By.XPATH,\
-             "//span[@class='entity-result__title-textt-16']/a[@class='app-aware-link']").get_attribute('href')
+            profile_url = profile.find_element(By.XPATH,\
+             ".//div[@class='display-flex align-items-center']/a[@class='app-aware-link  scale-down ']").get_attribute('href')
 
-            fullname = profile.find_element(By.XPATH,\
-             "//span[@class='entity-result__title-textt-16']/a[@class='app-aware-link']/\
-                span/span[@class='visually-hidden']").text
+            try:
+                img_element = driver.find_element(By.XPATH,\
+                    ".//img[@class='presence-entity__image  \
+                          ivm-view-attr__img--centered EntityPhoto-circle-3  \
+                              EntityPhoto-circle-3 lazy-image ember-view']")
+                img_src = img_element.get_attribute("src")
+                fullname = img_element.get_attribute("alt")
+            except:
+                print(profile.get_attribute('outerHTML'))
+                img_src = ""
+                try:
+                    fullname = profile.find_element(By.XPATH,\
+                        ".//span[@class='entity-result__title-text        \
+                            t-16']/a[@class='app-aware-link ']/\
+                            span[1]/span[1]").text
+                except:
+                    fullname = ""
 
             try:
                 headline = profile.find_element(By.XPATH,\
-                "//div[@class='linked-area flex-1 cursor-text']/a[@class='app-aware-link']/\
+                ".//div[@class='linked-area flex-1    cursor-text']/\
                     div[@class='entity-result__primary-subtitle t-14 t-black t-normal']").text
             except:
                 headline = ""
 
-            try:
-                img_src = driver.find_element(By.XPATH,\
-                    "//img[@class='presence-entity__image\  ivm-view-attr__img--centered EntityPhoto-circle-3\
-                        EntityPhoto-circle-3 lazy-image ember-view']").get_attribute("src")
-            except:
-                img_src = ""
+
 
             page_profiles["fullname"].append(fullname)
             page_profiles["headline"].append(headline)
-            page_profiles["url"].append(url)
+            page_profiles["url"].append(profile_url)
             page_profiles["headshot_src"].append(img_src)
+            print(page_profiles)
         
         page_df = pd.DataFrame(page_profiles)
+        print(page_df)
         """odf = pred_wiki_name(page_df,'fullname', conf_int=0.9)
         filtered_df = page_df[odf["race"]=="Asian,IndianSubContinent"]
         pd.concat([df, filtered_df])"""
         pd.concat([df, page_df])
 
-    df.to_csv(out_csv, mode='a', index=False, header=False)
+    df.to_csv(out_csv, mode='a', index=True, header=True)
 
 
 if __name__ == "__main__":
     options = webdriver.ChromeOptions()
     options.headless = False
+    options.add_argument('--disable-blink-features=AutomationControlled')
     driver = log_in(webdriver.Chrome(options=options), EMAIL, PASS)
 
     studies = ['computer science', 'data science', 'electrical engineering', 'mechanical engineering']
