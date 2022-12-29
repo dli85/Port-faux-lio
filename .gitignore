@@ -1,3 +1,4 @@
-login.env
 .idea/*
+.vscode/*
 __pycache__/
+src/login.env
